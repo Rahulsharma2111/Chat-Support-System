@@ -1,0 +1,220 @@
+npm install
+npm run dev
+
+npm i -D nodemon
+npm install
+npm init -y
+npm install express socket.io winston dotenv cors jsonwebtoken uuid
+
+Features Implemented
+✅ Express.js server with configurable port
+✅ Middlewares for logging, authentication, and error handling
+✅ Chat session management with POST /start-session endpoint
+✅ Real-time messaging with Socket.io and room-based communication
+✅ Winston logging to console and file
+✅ All required endpoints (POST /start-session, GET /messages/:sessionId, GET /health)
+✅ Bonus: In-memory storage for chats
+✅ Bonus: End session functionality
+✅ Bonus: Agent assignment with limit of 2 users per agent
+
+how to test in backend on postman
+
+
+-----------------------------------------------
+
+API Endpoints Testing
+1. Health Check
+Method: GET
+
+URL: {{baseUrl}}/health
+
+Headers: None needed
+
+Expected Response:
+
+json
+{
+  "status": "OK",
+  "message": "Server is healthy"
+}
+2. Generate Token
+Method: POST
+
+URL: {{baseUrl}}/auth/token
+
+Headers:
+
+Content-Type: application/json
+
+Body:
+
+json
+{
+  "userId": "testUser123"
+}
+Expected Response:
+
+json
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+}
+3. Start a New Session
+Method: POST
+
+URL: {{baseUrl}}/session/start
+
+Headers:
+
+Authorization: Bearer {{token}}
+
+Content-Type: application/json
+
+Body: None
+
+Expected Response:
+
+json
+{
+  "sessionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+  "agentId": "agent1",
+  "message": "Chat session started successfully"
+}
+4. Get Session Details
+Method: GET
+
+URL: {{baseUrl}}/session/{{sessionId}}
+
+Headers:
+
+Authorization: Bearer {{token}}
+
+Replace {{sessionId}} with the session ID from the previous response
+
+Expected Response:
+
+json
+{
+  "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+  "userId": "testUser123",
+  "agentId": "agent1",
+  "status": "active",
+  "createdAt": "2023-10-15T12:34:56.789Z"
+}
+5. Get Messages for a Session
+Method: GET
+
+URL: {{baseUrl}}/messages/{{sessionId}}
+
+Headers:
+
+Authorization: Bearer {{token}}
+
+Expected Response:
+
+json
+[
+  {
+    "id": "1234567890",
+    "sessionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "senderId": "testUser123",
+    "content": "Hello, I need help",
+    "timestamp": "2023-10-15T12:35:01.123Z"
+  }
+]
+6. Testing WebSocket Connections
+For testing WebSocket functionality, you'll need a WebSocket client. Postman now supports WebSocket testing, but you can also use other tools like wscat.
+
+Using wscat (Command Line Tool):
+Install wscat: npm install -g wscat
+
+Connect to the server:
+
+bash
+wscat -c "ws://localhost:3001" -H "Authorization: Bearer YOUR_TOKEN_HERE"
+Send messages in JSON format:
+
+json
+{"type": "join_session", "data": {"sessionId": "YOUR_SESSION_ID", "userId": "testUser123"}}
+json
+{"type": "send_message", "data": {"sessionId": "YOUR_SESSION_ID", "senderId": "testUser123", "content": "Hello from WebSocket"}}
+Using Postman WebSocket Client:
+Create a new WebSocket request
+
+Enter URL: ws://localhost:3001
+
+Add header: Authorization: Bearer YOUR_TOKEN_HERE
+
+Connect and send messages as shown above
+
+
+------------------------------------
+
+Step 3: Testing Socket.io with Postman
+1. Create a WebSocket Request in Postman
+Open Postman and create a new request
+
+Change the request type from HTTP to WebSocket
+
+Enter the WebSocket URL: ws://localhost:3001
+
+Add the following headers:
+
+Authorization: Bearer YOUR_TOKEN_HERE
+
+2. Generate a Token First
+Before connecting via WebSocket, generate a token:
+
+Create a POST request to http://localhost:3001/auth/token
+
+Set body to:
+
+json
+{
+  "userId": "testUser123"
+}
+Send the request and copy the token from the response
+
+3. Connect to WebSocket
+In your WebSocket request, replace YOUR_TOKEN_HERE with the actual token
+
+Click "Connect" to establish the WebSocket connection
+
+4. Test Socket Events
+After connecting, you can send different Socket.io events:
+
+A. Join a Session
+First, create a session using the HTTP API:
+
+POST to http://localhost:3001/session/start with Authorization header
+
+Copy the sessionId from the response
+
+Then send this via WebSocket:
+
+json
+{
+  "type": "join_session",
+  "data": {
+    "sessionId": "YOUR_SESSION_ID",
+    "userId": "testUser123"
+  }
+}
+B. Send a Message
+json
+{
+  "type": "send_message",
+  "data": {
+    "sessionId": "YOUR_SESSION_ID",
+    "senderId": "testUser123",
+    "content": "Hello from Postman!"
+  }
+}
+C. End a Session
+json
+{
+  "type": "end_session",
+  "data": {
+    "sessionId": "YOUR_SESSION_ID",
+    "userId": "testUser123"
+  }
+}

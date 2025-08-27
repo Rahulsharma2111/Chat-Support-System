@@ -1,0 +1,40 @@
+GET= http://localhost:3001/health
+
+POST=http://localhost:3001/auth/token
+Body= {
+  "userId":"test user1"
+}
+
+POST=http://localhost:3001/session/start
+Response={
+  "sessionId": "4638ae79-1c00-4cd0-bc45-6d14bc8639f7",
+  "agentId": "agent2",
+  "message": "Chat session started successfully"
+}
+
+GET=http://localhost:3001/session/4638ae79-1c00-4cd0-bc45-6d14bc8639f7
+Response={
+  "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+  "userId": "testUser123",
+  "agentId": "agent1",
+  "status": "active",
+  "createdAt": "2023-10-15T12:34:56.789Z"
+}
+
+GET=http://localhost:3001/messages/4638ae79-1c00-4cd0-bc45-6d14bc8639f7
+Response=get all messages
+like this=[
+  {
+    "id": "1234567890",
+    "sessionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "senderId": "testUser123",
+    "content": "Hello, I need help",
+    "timestamp": "2023-10-15T12:35:01.123Z"
+  }
+]
+
+
+Socket
+
+URL: ws://localhost:3001
+Add header: Authorization: Bearer YOUR_TOKEN_HERE

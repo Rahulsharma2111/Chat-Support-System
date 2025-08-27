@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Support System</title>
+    <link rel="stylesheet" href="src/styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Chat Support System</h1>
+            <div id="auth-section">
+                <input type="text" id="userId" placeholder="Enter your user ID">
+                <button id="login-btn">Login</button>
+                <div id="user-info" class="hidden">
+                    <span>Logged in as: <span id="logged-user"></span></span>
+                    <span id="connection-status" class="connection-status disconnected">Disconnected</span>
+                    <button id="logout-btn">Logout</button>
+                </div>
+            </div>
+        </header>
+
+        <main>
+            <div id="session-section" class="hidden">
+                <button id="start-session-btn">Start New Chat Session</button>
+                
+                <div id="sessions-list" class="hidden">
+                    <h3>Your Active Sessions</h3>
+                    <ul id="sessions-container"></ul>
+                </div>
+                
+                <div id="active-session" class="hidden">
+                    <h3>Session: <span id="session-id"></span> with <span id="agent-id"></span></h3>
+                    <div id="chat-container">
+                        <div id="messages"></div>
+                        <div id="message-input">
+                            <input type="text" id="message-text" placeholder="Type your message...">
+                            <button id="send-btn">Send</button>
+                        </div>
+                    </div>
+                    <button id="end-session-btn">End Session</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Load Socket.io client from CDN -->
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script src="src/app.js"></script>
+</body>
+</html>
