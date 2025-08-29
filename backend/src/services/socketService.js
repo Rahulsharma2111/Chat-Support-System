@@ -90,7 +90,6 @@
 // module.exports = { setupSocket };
 
 
-
 const jwt = require('jsonwebtoken');
 const { addMessage } = require('./messageService');
 const { getSession, endSession, getAgentSessions } = require('./sessionService');
@@ -98,7 +97,7 @@ const logger = require('../utils/logger');
 
 function authenticateSocket(socket, next) {
   try {
-    // Try to get token from auth first, then from query
+    // Try to get token from auth first
     let token = socket.handshake.auth.token;
     if (!token) {
       token = socket.handshake.query.token;

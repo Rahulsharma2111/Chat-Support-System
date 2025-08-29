@@ -33,7 +33,7 @@
 
 const logger = require('../utils/logger');
 
-// In-memory storage for demo purposes
+// In-memory storage 
 const messages = new Map();
 
 function addMessage(sessionId, senderId, content) {

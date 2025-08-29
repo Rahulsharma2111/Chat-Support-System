@@ -1,6 +1,6 @@
 const logger = require('../utils/logger');
 
-// In-memory storage for demo purposes
+// In-memory storage 
 const sessions = new Map();
 const agents = [
   { id: 'agent1', name: 'Agent John', activeSessions: 0, isAvailable: true },

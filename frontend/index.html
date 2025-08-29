@@ -1,52 +1,988 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat Support System</title>
-    <link rel="stylesheet" href="src/styles.css">
+    <title>Fixed Chat App</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f7f9;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #6e8efb, #a777e3);
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin: 0;
+        }
+
+        .connection-status {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .connected {
+            background-color: rgb(248 248 248 / 20%);
+            color: #00fe6b
+        }
+
+        .disconnected {
+            background-color: rgb(248 248 248 / 20%);
+            color: #c0392b;
+        }
+
+        main {
+            padding: 20px;
+        }
+
+        section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border-radius: 8px;
+            background-color: #fff;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        h2 {
+            margin-bottom: 15px;
+            color: #2c3e50;
+            font-size: 20px;
+            border-bottom: 2px solid #f0f2f5;
+            padding-bottom: 10px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            margin-bottom: 15px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus {
+            border-color: #6e8efb;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(110, 142, 251, 0.2);
+        }
+
+        button {
+            padding: 12px 20px;
+            background: linear-gradient(135deg, #6e8efb, #a777e3);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        button:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .user-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .session-list {
+            list-style: none;
+            margin-top: 15px;
+        }
+
+        .session-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .session-item:last-child {
+            border-bottom: none;
+        }
+
+        .session-info {
+            flex: 1;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+
+        .status-active {
+            background-color: #27ae60;
+        }
+
+        .status-ended {
+            background-color: #95a5a6;
+        }
+
+        .session-actions button {
+            margin-left: 10px;
+            padding: 8px 15px;
+            font-size: 14px;
+        }
+
+        .active-session {
+            border: 2px solid #e6e9ed;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .session-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .messages-container {
+            height: 300px;
+            overflow-y: auto;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            padding: 10px 15px;
+            border-radius: 18px;
+            max-width: 80%;
+            word-wrap: break-word;
+        }
+
+        .message-info {
+            font-size: 12px;
+            color: #7f8c8d;
+            margin-bottom: 5px;
+        }
+
+        .user {
+            background-color: #dcf8c6;
+            margin-left: auto;
+            border-bottom-right-radius: 4px;
+        }
+
+        .agent {
+            background-color: #6e8efb;
+            color: white;
+            margin-right: auto;
+            border-bottom-left-radius: 4px;
+        }
+
+        .system {
+            background-color: #f0f2f5;
+            margin: 0 auto;
+            text-align: center;
+            font-style: italic;
+            max-width: 100%;
+            border-radius: 8px;
+        }
+
+        .other-user {
+            background-color: #e6e9ed;
+            margin-right: auto;
+            border-bottom-left-radius: 4px;
+        }
+
+        .message-input {
+            display: flex;
+            gap: 10px;
+        }
+
+        .message-input input {
+            flex: 1;
+            margin-bottom: 0;
+        }
+
+        .message-input button {
+            flex-shrink: 0;
+        }
+
+        .session-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .session-actions button {
+            flex: 1;
+        }
+
+        #end-session-btn {
+            background: linear-gradient(135deg, #ff7e5f, #feb47b);
+        }
+
+        #logout-btn {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: #7f8c8d;
+            font-size: 14px;
+            border-top: 1px solid #eee;
+        }
+    </style>
 </head>
+
 <body>
     <div class="container">
         <header>
-            <h1>Chat Support System</h1>
-            <div id="auth-section">
-                <input type="text" id="userId" placeholder="Enter your user ID">
-                <button id="login-btn">Login</button>
-                <div id="user-info" class="hidden">
-                    <span>Logged in as: <span id="logged-user"></span></span>
-                    <span id="connection-status" class="connection-status disconnected">Disconnected</span>
-                    <button id="logout-btn">Logout</button>
-                </div>
-            </div>
+            <h1> Chat App</h1>
+            <div id="connection-status" class="connection-status disconnected">Disconnected</div>
         </header>
 
         <main>
-            <div id="session-section" class="hidden">
-                <button id="start-session-btn">Start New Chat Session</button>
-                
+            <section id="auth-section">
+                <h2>Login</h2>
+                <input type="text" id="userId" placeholder="Enter your user ID (e.g., user1 or agent1)">
+                <button id="login-btn">Login</button>
+            </section>
+
+            <section id="user-info" class="hidden">
+                <h2>User Information</h2>
+                <div class="user-info">
+                    <div><b>Username:</b> <span id="logged-user"></span></div>
+                    <button id="logout-btn">Logout</button>
+                </div>
+            </section>
+
+            <section id="session-section" class="hidden">
+                <h2>Your Chat's with agents</h2>
+                <button id="start-session-btn">Start New Chat</button>
+
                 <div id="sessions-list" class="hidden">
-                    <h3>Your Active Sessions</h3>
-                    <ul id="sessions-container"></ul>
+                    <h3>Your Chats</h3>
+                    <ul id="sessions-container" class="session-list"></ul>
                 </div>
-                
-                <div id="active-session" class="hidden">
-                    <h3>Session: <span id="session-id"></span> with <span id="agent-id"></span></h3>
-                    <div id="chat-container">
-                        <div id="messages"></div>
-                        <div id="message-input">
-                            <input type="text" id="message-text" placeholder="Type your message...">
-                            <button id="send-btn">Send</button>
-                        </div>
+
+                <div id="active-session" class="active-session hidden">
+                    <div class="session-header">
+                        <div>Session ID: <span id="session-id"></span></div>
+                        <div>Agent: <span id="agent-id"></span></div>
                     </div>
-                    <button id="end-session-btn">End Session</button>
+
+                    <div id="messages" class="messages-container"></div>
+
+                    <div class="message-input">
+                        <input type="text" id="message-text" placeholder="Type your message...">
+                        <button id="send-btn">Send</button>
+                    </div>
+
+                    <div class="session-actions">
+                        <button id="end-session-btn">End Session</button>
+                    </div>
                 </div>
-            </div>
+            </section>
         </main>
+
+        <footer>
+            <p>Chat support system roje projects</p>
+        </footer>
     </div>
 
-    <!-- Load Socket.io client from CDN -->
-    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
-    <script src="src/app.js"></script>
+    <script type="module">
+        // Import socket.io library from CDN
+        import { io } from 'https://cdn.socket.io/4.7.2/socket.io.esm.min.js';
+
+
+        const ChatApp = (() => {
+            let userId = null;
+            let token = null;
+            let sessions = [];
+            let currentSession = null;
+            let socket = null;
+            let isConnected = false;
+            const backendUrl = 'http://localhost:3001';
+            let isAgent = false;
+
+            // DOM Elements
+            let userIdInput, loginBtn, logoutBtn, authSection, userInfo, loggedUserSpan;
+            let connectionStatus, sessionSection, startSessionBtn, sessionsList;
+            let sessionsContainer, activeSession, sessionIdSpan, agentIdSpan;
+            let messagesContainer, messageText, sendBtn, endSessionBtn;
+
+            // Initialize the application
+            const initialize = () => {
+                initializeElements();
+                bindEvents();
+                loadFromStorage();
+            };
+
+            // Initialize DOM elements
+            const initializeElements = () => {
+                // Auth section
+                userIdInput = document.getElementById('userId');
+                loginBtn = document.getElementById('login-btn');
+                logoutBtn = document.getElementById('logout-btn');
+                authSection = document.getElementById('auth-section');
+                userInfo = document.getElementById('user-info');
+                loggedUserSpan = document.getElementById('logged-user');
+                connectionStatus = document.getElementById('connection-status');
+
+                // Session section
+                sessionSection = document.getElementById('session-section');
+                startSessionBtn = document.getElementById('start-session-btn');
+                sessionsList = document.getElementById('sessions-list');
+                sessionsContainer = document.getElementById('sessions-container');
+
+                // Active session
+                activeSession = document.getElementById('active-session');
+                sessionIdSpan = document.getElementById('session-id');
+                agentIdSpan = document.getElementById('agent-id');
+                messagesContainer = document.getElementById('messages');
+                messageText = document.getElementById('message-text');
+                sendBtn = document.getElementById('send-btn');
+                endSessionBtn = document.getElementById('end-session-btn');
+
+                console.log('DOM elements initialized:', {
+                    sessionIdSpan: !!sessionIdSpan,
+                    agentIdSpan: !!agentIdSpan,
+                    activeSession: !!activeSession
+                });
+            };
+
+            // Bind event listeners
+            const bindEvents = () => {
+                loginBtn.addEventListener('click', login);
+                logoutBtn.addEventListener('click', logout);
+                startSessionBtn.addEventListener('click', startSession);
+                sendBtn.addEventListener('click', sendMessage);
+                endSessionBtn.addEventListener('click', () => endSession());
+                messageText.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') sendMessage();
+                });
+            };
+
+            // Load data from localStorage
+            const loadFromStorage = () => {
+                const savedToken = localStorage.getItem('chatToken');
+                const savedUserId = localStorage.getItem('chatUserId');
+
+                if (savedToken && savedUserId) {
+                    token = savedToken;
+                    userId = savedUserId;
+                    isAgent = userId.startsWith('agent');
+                    showUserInterface();
+                    connectSocket();
+                }
+            };
+
+            // Save data to localStorage
+            const saveToStorage = () => {
+                if (token) {
+                    localStorage.setItem('chatToken', token);
+                }
+                if (userId) {
+                    localStorage.setItem('chatUserId', userId);
+                }
+            };
+
+            // Clear localStorage
+            const clearStorage = () => {
+                localStorage.removeItem('chatToken');
+                localStorage.removeItem('chatUserId');
+            };
+
+            // Login function
+            const login = async () => {
+                const userInput = userIdInput.value.trim();
+                if (!userInput) {
+                    alert('Please enter a user ID');
+                    return;
+                }
+
+                try {
+                    const response = await fetch(`${backendUrl}/auth/token`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ userId: userInput })
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Failed to login');
+                    }
+
+                    const data = await response.json();
+                    token = data.token;
+                    userId = data.userId;
+                    isAgent = userId.startsWith('agent');
+
+                    showUserInterface();
+                    connectSocket();
+                    saveToStorage();
+
+                } catch (error) {
+                    alert('Error logging in: ' + error.message);
+                    console.error('Login error:', error);
+                }
+            };
+
+            // Logout function
+            const logout = () => {
+                if (socket) {
+                    socket.disconnect();
+                }
+
+                userId = null;
+                token = null;
+                sessions = [];
+                currentSession = null;
+                isConnected = false;
+                isAgent = false;
+
+                hideUserInterface();
+                clearStorage();
+                updateConnectionStatus();
+            };
+
+            // Show user interface after login
+            const showUserInterface = () => {
+                authSection.classList.add('hidden');
+                userInfo.classList.remove('hidden');
+                sessionSection.classList.remove('hidden');
+                loggedUserSpan.textContent = userId;
+
+                // Show appropriate UI based on user type
+                if (isAgent) {
+                    startSessionBtn.classList.add('hidden');
+                    sessionsList.classList.remove('hidden');
+                    document.querySelector('#sessions-list h3').textContent = 'Your Assigned Sessions';
+                } else {
+                    startSessionBtn.classList.remove('hidden');
+                }
+
+                loadSessions();
+            };
+
+            // Hide user interface
+            const hideUserInterface = () => {
+                authSection.classList.remove('hidden');
+                userInfo.classList.add('hidden');
+                sessionSection.classList.add('hidden');
+                sessionsList.classList.add('hidden');
+                activeSession.classList.add('hidden');
+                userIdInput.value = '';
+                startSessionBtn.classList.remove('hidden');
+            };
+
+            // Update connection status UI
+            const updateConnectionStatus = () => {
+                if (isConnected) {
+                    connectionStatus.textContent = 'Connected';
+                    connectionStatus.className = 'connection-status connected';
+                } else {
+                    connectionStatus.textContent = 'Disconnected';
+                    connectionStatus.className = 'connection-status disconnected';
+                }
+            };
+
+            // Connect to socket.io server
+            const connectSocket = () => {
+                if (socket) {
+                    socket.disconnect();
+                }
+
+                try {
+                    socket = io(backendUrl, {
+                        auth: {
+                            token: token
+                        },
+                        transports: ['websocket', 'polling']
+                    });
+
+                    socket.on('connect', () => {
+                        isConnected = true;
+                        addMessage('System', 'Connected to server', 'system');
+                        console.log('Connected to server');
+                        updateConnectionStatus();
+
+                        // If agent, request current sessions
+                        if (isAgent) {
+                            socket.emit('get_agent_sessions');
+                        }
+                    });
+
+                    socket.on('disconnect', () => {
+                        isConnected = false;
+                        addMessage('System', 'Disconnected from server', 'system');
+                        console.log('Disconnected from server');
+                        updateConnectionStatus();
+                    });
+
+                    socket.on('new_message', (message) => {
+                        displayMessage(message);
+                    });
+
+                    socket.on('user_joined', (data) => {
+                        const userType = data.isAgent ? 'Agent' : 'User';
+                        addMessage('System', `${userType} ${data.userId} joined the session`, 'system');
+                    });
+
+                    socket.on('agent_joined', (data) => {
+                        addMessage('System', `Agent ${data.agentName} joined the session`, 'system');
+                        if (agentIdSpan) {
+                            agentIdSpan.textContent = data.agentName;
+                        }
+                    });
+
+                    socket.on('session_ended', (data) => {
+                        addMessage('System', 'Session has been ended', 'system');
+                        resetSession();
+                        loadSessions();
+                    });
+
+                    socket.on('agent_sessions', (sessionsData) => {
+                        sessions = sessionsData;
+                        renderSessionsList();
+                    });
+
+                    socket.on('error', (data) => {
+                        console.error('Socket error:', data);
+                        alert('Error: ' + data.message);
+                    });
+
+                    socket.on('connect_error', (error) => {
+                        console.error('Connection error:', error);
+                        addMessage('System', 'Connection error: ' + error.message, 'system');
+                        isConnected = false;
+                        updateConnectionStatus();
+                    });
+
+                } catch (error) {
+                    console.error('Error connecting socket:', error);
+                    alert('Error connecting to server: ' + error.message);
+                }
+            };
+
+            // Start a new session
+            const startSession = async () => {
+                try {
+                    console.log('Starting session with token:', token);
+                    const response = await fetch(`${backendUrl}/session/start`, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.error || 'Failed to start session');
+                    }
+
+                    const data = await response.json();
+                    currentSession = {
+                        id: data.sessionId,
+                        agentId: data.agentId,
+                        agentName: data.agentName
+                    };
+
+                    console.log('Session started:', currentSession);
+                    showActiveSession();
+
+                    // Join the session room via socket
+                    if (socket) {
+                        socket.emit('join_session', {
+                            sessionId: currentSession.id
+                        });
+                    }
+
+                    // Load previous messages
+                    loadMessages();
+
+                    // Reload sessions list
+                    loadSessions();
+
+                } catch (error) {
+                    alert('Error starting session: ' + error.message);
+                    console.error('Start session error:', error);
+                }
+            };
+
+            // Load user sessions
+            const loadSessions = async () => {
+                try {
+                    const response = await fetch(`${backendUrl}/session`, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+
+                    if (response.ok) {
+                        sessions = await response.json();
+                        renderSessionsList();
+                    } else if (response.status === 404) {
+                        sessions = [];
+                        renderSessionsList();
+                    } else {
+                        throw new Error('Failed to load sessions');
+                    }
+                } catch (error) {
+                    console.error('Error loading sessions:', error);
+                }
+            };
+
+            // Render sessions list
+            const renderSessionsList = () => {
+                if (sessions.length === 0) {
+                    sessionsList.classList.add('hidden');
+                    return;
+                }
+
+                sessionsList.classList.remove('hidden');
+                sessionsContainer.innerHTML = '';
+
+                sessions.forEach(session => {
+                    const sessionItem = document.createElement('li');
+                    sessionItem.className = 'session-item';
+
+                    const statusClass = session.status === 'active' ? 'status-active' : 'status-ended';
+                    const statusText = session.status === 'active' ? 'Active' : 'Ended';
+
+                    // Different info for agents vs users
+                    let sessionInfo = '';
+                    if (isAgent) {
+                        sessionInfo = `
+                            <strong>Session:</strong> ${session.id.substring(0, 8)}... 
+                            <strong>User:</strong> ${session.userId}
+                            <strong>Status:</strong> ${statusText}
+                        `;
+                    } else {
+                        sessionInfo = `
+                            <strong>Session:</strong> ${session.id.substring(0, 8)}... 
+                            <strong>Agent:</strong> ${session.agentName || session.agentId}
+                            <strong>Status:</strong> ${statusText}
+                        `;
+                    }
+
+                    sessionItem.innerHTML = `
+                        <div class="session-info">
+                            <span class="status-indicator ${statusClass}"></span>
+                            ${sessionInfo}
+                        </div>
+                        <div class="session-actions">
+                            ${session.status === 'active' ? `
+                                <button class="join-session-btn" data-session="${session.id}">Join</button>
+                                <button class="end-session-btn" data-session="${session.id}">End</button>
+                            ` : ''}
+                        </div>
+                    `;
+
+                    sessionsContainer.appendChild(sessionItem);
+                });
+
+                // Add event listeners to buttons
+                document.querySelectorAll('.join-session-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const sessionId = e.target.dataset.session;
+                        joinSession(sessionId);
+                    });
+                });
+
+                document.querySelectorAll('.end-session-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const sessionId = e.target.dataset.session;
+                        endSession(sessionId);
+                    });
+                });
+            };
+
+            // Join an existing session
+            const joinSession = async (sessionId) => {
+                try {
+                    const response = await fetch(`${backendUrl}/session/${sessionId}`, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.error || 'Failed to join session');
+                    }
+
+                    const session = await response.json();
+                    currentSession = {
+                        id: session.id,
+                        agentId: session.agentId,
+                        agentName: session.agentName
+                    };
+
+                    showActiveSession();
+
+                    // Join the session room via socket
+                    if (socket) {
+                        socket.emit('join_session', {
+                            sessionId: currentSession.id
+                        });
+                    }
+
+                    // Load previous messages
+                    loadMessages();
+
+                } catch (error) {
+                    alert('Error joining session: ' + error.message);
+                    console.error('Join session error:', error);
+                }
+            };
+
+            // Show active session UI
+            const showActiveSession = () => {
+                console.log('Showing active session:', {
+                    currentSession,
+                    sessionIdSpan: !!sessionIdSpan,
+                    agentIdSpan: !!agentIdSpan,
+                    activeSession: !!activeSession
+                });
+
+                if (!sessionIdSpan || !agentIdSpan || !activeSession) {
+                    console.error('DOM elements not properly initialized');
+                    initializeElements(); // Reinitialize elements if needed
+                }
+
+                if (currentSession && sessionIdSpan) {
+                    sessionIdSpan.textContent = currentSession.id.substring(0, 8) + '...';
+                }
+
+                if (isAgent && agentIdSpan) {
+                    agentIdSpan.textContent = 'You are the agent';
+                } else if (currentSession && agentIdSpan) {
+                    agentIdSpan.textContent = currentSession.agentName || currentSession.agentId || 'Not assigned';
+                }
+
+                if (activeSession) {
+                    activeSession.classList.remove('hidden');
+                }
+
+                if (messagesContainer) {
+                    messagesContainer.innerHTML = '';
+                }
+            };
+
+            // Load messages for current session
+            const loadMessages = async () => {
+                try {
+                    if (!currentSession) return;
+
+                    const response = await fetch(`${backendUrl}/messages/${currentSession.id}`, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+
+                    if (response.ok) {
+                        const messages = await response.json();
+                        messages.forEach(message => displayMessage(message));
+                    }
+                } catch (error) {
+                    console.error('Error loading messages:', error);
+                }
+            };
+
+            // Send a message
+            const sendMessage = () => {
+                if (!isConnected) {
+                    alert('Not connected to server');
+                    return;
+                }
+
+                if (!socket) {
+                    alert('Socket connection not established');
+                    return;
+                }
+
+                if (!messageText) {
+                    console.error('Message text element not found');
+                    return;
+                }
+
+                const content = messageText.value.trim();
+                if (!content || !currentSession) return;
+
+                socket.emit('send_message', {
+                    sessionId: currentSession.id,
+                    content: content
+                });
+
+                messageText.value = '';
+            };
+
+            // Display a message in the UI
+            const displayMessage = (message) => {
+                if (!messagesContainer) {
+                    console.error('Messages container not found');
+                    return;
+                }
+
+                const messageEl = document.createElement('div');
+                messageEl.classList.add('message');
+
+                // Determine message type
+                if (message.senderId === userId) {
+                    messageEl.classList.add('user');
+                } else if (message.senderId.startsWith('agent')) {
+                    messageEl.classList.add('agent');
+                } else {
+                    messageEl.classList.add('other-user');
+                }
+
+                const time = new Date(message.timestamp).toLocaleTimeString();
+                const senderName = message.senderId.startsWith('agent') ?
+                    `Agent ${message.senderId.replace('agent', '')}` :
+                    message.senderId;
+
+                messageEl.innerHTML = `
+                    <div class="message-info">${senderName} at ${time}</div>
+                    <div class="message-content">${message.content}</div>
+                `;
+
+                messagesContainer.appendChild(messageEl);
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            };
+
+            // Add a system message
+            const addMessage = (sender, content, type = 'system') => {
+                if (!messagesContainer) {
+                    console.error('Messages container not found');
+                    return;
+                }
+
+                const messageEl = document.createElement('div');
+                messageEl.classList.add('message');
+                messageEl.classList.add(type);
+
+                const time = new Date().toLocaleTimeString();
+                messageEl.innerHTML = `
+                    <div class="message-info">${sender}</div>
+                    <div class="message-content">${content}</div>
+                `;
+
+                messagesContainer.appendChild(messageEl);
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            };
+
+            // End a session
+            const endSession = async (sessionId = null) => {
+                const targetSessionId = sessionId || (currentSession ? currentSession.id : null);
+                if (!targetSessionId) return;
+
+                try {
+                    const response = await fetch(`${backendUrl}/session/${targetSessionId}/end`, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.error || 'Failed to end session');
+                    }
+
+                    if (!sessionId) {
+                        // If ending the current session
+                        if (socket) {
+                            socket.emit('end_session', {
+                                sessionId: targetSessionId
+                            });
+                        }
+
+                        resetSession();
+                    }
+
+                    // Reload sessions list
+                    loadSessions();
+
+                } catch (error) {
+                    alert('Error ending session: ' + error.message);
+                    console.error('End session error:', error);
+                }
+            };
+
+            // Reset current session
+            const resetSession = () => {
+                currentSession = null;
+                if (sessionIdSpan) sessionIdSpan.textContent = '';
+                if (agentIdSpan) agentIdSpan.textContent = '';
+                if (messagesContainer) messagesContainer.innerHTML = '';
+                if (activeSession) activeSession.classList.add('hidden');
+            };
+
+            // Public API
+            return {
+                initialize
+            };
+        })();
+
+        // Initialize the app when the page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            ChatApp.initialize();
+        });
+    </script>
 </body>
+
 </html>
